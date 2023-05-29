@@ -33,9 +33,13 @@ resetButton.style.display = "none"; // Esconder o botão inicialmente
 
 const waitingMessageElement = document.getElementById("waiting-message");
 waitingMessageElement.style.display = "block";
+
 waitingMessageElement.innerHTML = "Aguardando oponente escolher o nome...";
 
+const statusName = document.getElementById("status-name");
+statusName.innerHTML = "Pressione Enter para enviar";
 const nameInput = document.getElementById("name-input");
+
 
 nameInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
@@ -86,6 +90,7 @@ function determineResult(player, opponent) {
 
 function setPlayerName() {
     playerName = nameInput.value;
+    statusName.innerHTML = "Nome escolhido: " + playerName;
     socket.emit("setPlayerName", playerName);
 }
 
