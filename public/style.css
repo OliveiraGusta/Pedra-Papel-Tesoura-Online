@@ -22,3 +22,17 @@ canvas {
     margin: 20px;
     padding: 10px 50px;
 }
+
+.options-button > label, input, button, p{
+    font-size: 2rem;
+    margin: 20px;
+    padding: 10px 50px;
+}
+
+#player-input{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}

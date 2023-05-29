@@ -40,61 +40,79 @@ io.on("connection", (socket) => {
   // Envia as jogadas disponíveis para o novo jogador
   socket.emit("plays", plays);
 
-// Função para determinar o resultado do jogo
-function determineResult(player, opponent) {
-  if (player === opponent) {
-    return "Empate!";
-  } else if (
-    (player === "Pedra" && opponent === "Tesoura") ||
-    (player === "Papel" && opponent === "Pedra") ||
-    (player === "Tesoura" && opponent === "Papel")
-  ) {
-    return "Você ganhou!";
-  } else {
-    return "Você perdeu!";
+  // Quando um jogador envia o nome
+  socket.on("setPlayerName", (name) => {
+    console.log(`Nome do jogador ${socket.id}: ${name}`);
+    rooms[room].name = name;
+
+    // Verifica se ambos os jogadores já enviaram o nome
+    const players = rooms[room].players;
+    if (players.length === 2) {
+      const player1 = players[0];
+      const player2 = players[1];
+
+      // Envia o nome do jogador e a mensagem de espera para o oponente
+      const opponent = player1 === socket.id ? player2 : player1;
+      const playerName = rooms[room].name;
+      io.to(opponent).emit("opponentName", playerName);
+    }
+  });
+
+  // Função para determinar o resultado do jogo
+  function determineResult(player, opponent) {
+    if (player === opponent) {
+      return "Empate!";
+    } else if (
+      (player === "Pedra" && opponent === "Tesoura") ||
+      (player === "Papel" && opponent === "Pedra") ||
+      (player === "Tesoura" && opponent === "Papel")
+    ) {
+      return "Você ganhou!";
+    } else {
+      return "Você perdeu!";
+    }
   }
-}
 
-// Quando um jogador faz uma jogada
-socket.on("play", (play) => {
-  console.log(`Jogada do jogador ${socket.id} na sala ${room}: ${play}`);
+  // Quando um jogador faz uma jogada
+  socket.on("play", (play) => {
+    console.log(`Jogada do jogador ${socket.id} na sala ${room}: ${play}`);
 
-  const opponent = rooms[room].players.find((player) => player !== socket.id);
-  if (!opponent) {
-    return;
-  }
+    const opponent = rooms[room].players.find((player) => player !== socket.id);
+    if (!opponent) {
+      return;
+    }
 
-  // Inicializa a estrutura de jogadas para a sala, se ainda não estiver inicializada
-  if (!rooms[room].plays) {
-    rooms[room].plays = {};
-  }
+    // Inicializa a estrutura de jogadas para a sala, se ainda não estiver inicializada
+    if (!rooms[room].plays) {
+      rooms[room].plays = {};
+    }
 
-  // Armazena a jogada do jogador
-  rooms[room].plays[socket.id] = play;
+    // Armazena a jogada do jogador
+    rooms[room].plays[socket.id] = play;
 
-  io.to(opponent).emit("waiting", "Aguardando sua jogada...");
-  // Verifica se ambos os jogadores já fizeram suas jogadas
-  const players = Object.keys(rooms[room].plays);
-  if (players.length === 2) {
-    const player1 = players[0];
-    const player2 = players[1];
+    io.to(opponent).emit("waiting", "Aguardando sua jogada...");
+    // Verifica se ambos os jogadores já fizeram suas jogadas
+    const players = Object.keys(rooms[room].plays);
+    if (players.length === 2) {
+      const player1 = players[0];
+      const player2 = players[1];
 
-    const player1Play = rooms[room].plays[player1];
-    const player2Play = rooms[room].plays[player2];
+      const player1Play = rooms[room].plays[player1];
+      const player2Play = rooms[room].plays[player2];
 
-    // Verifica o resultado do jogo
-    const resultPlayer1 = determineResult(player1Play, player2Play);
-    const resultPlayer2 = determineResult(player2Play, player1Play);
+      // Verifica o resultado do jogo
+      const resultPlayer1 = determineResult(player1Play, player2Play);
+      const resultPlayer2 = determineResult(player2Play, player1Play);
 
-    // Envia o resultado para cada jogador
-    io.to(player1).emit("result", { player: player1Play, opponent: player2Play, result: resultPlayer1 });
-    io.to(player2).emit("result", { player: player2Play, opponent: player1Play, result: resultPlayer2 });
+      // Envia o resultado para cada jogador
+      io.to(player1).emit("result", { player: player1Play, opponent: player2Play, result: resultPlayer1 });
+      io.to(player2).emit("result", { player: player2Play, opponent: player1Play, result: resultPlayer2 });
 
-    // Limpa as jogadas da sala
-    delete rooms[room].plays[player1];
-    delete rooms[room].plays[player2];
-  }
-});
+      // Limpa as jogadas da sala
+      delete rooms[room].plays[player1];
+      delete rooms[room].plays[player2];
+    }
+  });
 
 
   // Quando um jogador se desconecta

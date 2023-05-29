@@ -5,9 +5,8 @@ const pedraButton = document.getElementById("pedra-option");
 const papelButton = document.getElementById("papel-option");
 const tesouraButton = document.getElementById("tesoura-option");
 
-document.getElementById("set-name-button").addEventListener("click", setPlayerName);
-const setNameButton = document.getElementById("set-name-button");
-setNameButton.style.display = "block";
+const gameContainer = document.getElementById("game-container");
+const playerInput = document.getElementById("player-input");
 
 pedraButton.addEventListener("click", () => makePlay("Pedra"));
 papelButton.addEventListener("click", () => makePlay("Papel"));
@@ -26,20 +25,31 @@ let gameState = "waiting";
 let waitingMessage = "";
 
 const optionsPlay = document.getElementById("options-play");
-optionsPlay.style.display = "flex";
+optionsPlay.style.display = "none";
 
 const resetButton = document.getElementById("reset-button");
 resetButton.addEventListener("click", resetGame);
 resetButton.style.display = "none"; // Esconder o botão inicialmente
 
+const waitingMessageElement = document.getElementById("waiting-message");
+waitingMessageElement.style.display = "block";
+waitingMessageElement.innerHTML = "Aguardando oponente escolher o nome...";
+
+const nameInput = document.getElementById("name-input");
+
+nameInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      setPlayerName();
+      checkNames(); // Verificar se ambos os nomes estão definidos
+    }
+  });
+
 const socket = io();
+
 socket.on("plays", (availablePlays) => {
     plays = availablePlays;
     draw();
 });
-
-
-
 
 socket.on("result", (data) => {
     playerPlay = data.player;
@@ -54,7 +64,11 @@ socket.on("waiting", (message) => {
     draw();
 });
 
-
+socket.on("opponentName", (name) => {
+    opponentName = name;
+    waitingMessageElement.innerHTML = "Oponente aguardando você escolher seu nome...";
+    checkNames(); // Verificar se ambos os nomes estão definidos
+  });
 
 function determineResult(player, opponent) {
     if (player === opponent) {
@@ -71,15 +85,20 @@ function determineResult(player, opponent) {
 }
 
 function setPlayerName() {
-    playerName = prompt("Digite seu nome:");
+    playerName = nameInput.value;
     socket.emit("setPlayerName", playerName);
-    setNameButton.style.display = "none";
-    document.getElementById("namePlayer").innerHTML = playerName;
+}
+
+function checkNames() {
+    if (opponentName !== null && opponentName !== "" && playerName !== null && playerName !== "") {
+      console.log(opponentName + " vs " + playerName);
+      playerInput.style.display = "none";
+      gameContainer.style.display = "block";
+      document.getElementById("namePlayer").innerHTML = `${playerName} vs ${opponentName}`;
+      draw(); // Atualizar a tela quando ambos os nomes estiverem definidos
+    }
   }
-
-
-
-
+  
 function imagePlayerPlay(play) {
     const image = new Image();
     image.src = `images/${play}.png`;
@@ -89,11 +108,12 @@ function imagePlayerPlay(play) {
         context.drawImage(image, x, y, image.width / 6, image.height / 6);
     };
 }
+
 function imageOpponentPlay(play) {
     const image = new Image();
     image.src = `images/${play}.png`;
-    image.onload = function() {
-        const x = canvas.width  - (image.width / 4) ;
+    image.onload = function () {
+        const x = canvas.width - image.width / 4;
         const y = (canvas.height - image.height / 8) / 2;
         context.drawImage(image, x, y, image.width / 6, image.height / 6);
     };
@@ -102,7 +122,6 @@ function imageOpponentPlay(play) {
 function draw() {
     const playSize = canvas.width / 3;
     context.clearRect(0, 0, canvas.width, canvas.height);
-
     // Posicionar a imagem "versus.png" no centro da tela
     const image = new Image();
     image.src = "images/versus.png";
@@ -112,7 +131,14 @@ function draw() {
         context.drawImage(image, x, y, image.width / 8, image.height / 8);
     };
 
-   
+    if (opponentName !== null && opponentName !== "" && playerName !== null && playerName !== "")
+    {
+        console.log(opponentName + " vs " + playerName);
+        playerInput.style.display = "none";
+        gameContainer.style.display = "block";
+        
+    }
+
     if (waitingMessage !== "") {
         context.font = "24px Arial";
         context.textAlign = "right";
@@ -120,7 +146,6 @@ function draw() {
         context.fillText(waitingMessage, canvas.width - 10, canvas.height / 2);
     }
 
-    
     if (playerPlay !== null) {
         imagePlayerPlay(playerPlay);
         optionsPlay.style.display = "none";
@@ -135,14 +160,13 @@ function draw() {
         context.textAlign = "right";
         context.textBaseline = "middle";
         context.fillText("Aguardando oponente...", canvas.width - 10, canvas.height / 2);
-
     } else if (playerPlay !== null && opponentPlay !== null && result !== null) {
         context.clearRect(0, 0, canvas.width, canvas.height);
         context.font = "30px Arial";
         context.textAlign = "center";
         context.textBaseline = "middle";
-        context.fillText(`${playerName} : ${playerPlay} | Oponente: ${opponentPlay}`, canvas.width / 2, canvas.height - 20);
-        
+        context.fillText(`${playerName} : ${playerPlay} | ${opponentName}: ${opponentPlay}`, canvas.width / 2, canvas.height - 50);
+
         context.font = "45px Arial";
         context.fillText(result, canvas.width / 2, canvas.height / 3);
         context.fillStyle = "#DDD";
@@ -152,18 +176,11 @@ function draw() {
 
         resetButton.style.display = "block"; // Mostrar o botão "reset-button"
         waitingMessage = "";
-
     } else {
         resetButton.style.display = "none";
         optionsPlay.style.display = "flex";
         // Esconder o botão "reset-button"
     }
-}
-
-function drawWaitingMessage() {
-    context.font = "24px Arial";
-    context.textAlign = "center";
-    context.fillText(waitingMessage, canvas.width / 2, playSize * 2);
 }
 
 function makePlay(play) {

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 
 <head>
     <meta charset="UTF-8">
@@ -8,16 +8,19 @@
     <title>Pedra, Papel e Tesoura</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
-
 </head>
 
 <body>
-    <h1>Jogo Pedra, Papel e Tesoura</h1>
     <script src="/socket.io/socket.io.js"></script>
-    <h2 id="namePlayer"></h2>
-    <button id="set-name-button" class="options-button">Definir Nome</button>
-    <canvas id="game-canvas" width="800" height="800"></canvas>
-    <div id="game-container">
+    <div id="player-input" class="options-button">
+        <label for="player-name" >Nome do jogador:</label>
+        <input id="name-input" type="text" placeholder="Digite seu nome">Aperte Enter para enviar</input>
+        <p id="waiting-message"></p>
+    </div>
+    <div id="game-container" style="display: none">
+        <h2 id="namePlayer"></h2>
+        <canvas id="game-canvas" width="800" height="700"></canvas>
+
         <button id="reset-button">Jogar Novamente</button>
         <div id="options-play">
             <button class="options-button" id="pedra-option">Pedra</button>

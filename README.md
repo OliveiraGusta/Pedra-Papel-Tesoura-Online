@@ -22,8 +22,8 @@ Este jogo é uma boa oportunidade para aprender como utilizar o HTML5 Canvas par
 ## Como jogar
 01. Clone este repositório em sua máquina.
 02. Instale as dependências do projeto com o comando npm install.
-03. Inicie o servidor com o comando node server.js.
-04. Abra o arquivo index.html em seu navegador.
+03. Inicie o servidor com o comando node index.js.
+04. Digite seu nome no campo.
 05. Aguarde a chegada de outro jogador.
 06. Escolha uma das três opções (pedra, papel ou tesoura).
 07. Aguarde a escolha do outro jogador.
