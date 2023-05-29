@@ -72,7 +72,7 @@ socket.on("play", (play) => {
   // Armazena a jogada do jogador
   rooms[room].plays[socket.id] = play;
 
-  io.to(opponent).emit("waiting", "Adversário está aguardando sua jogada...");
+  io.to(opponent).emit("waiting", "Aguardando sua jogada...");
   // Verifica se ambos os jogadores já fizeram suas jogadas
   const players = Object.keys(rooms[room].plays);
   if (players.length === 2) {

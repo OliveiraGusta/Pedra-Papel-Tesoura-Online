@@ -12,9 +12,19 @@
 </head>
 
 <body>
+    <h1>Jogo Pedra, Papel e Tesoura</h1>
     <script src="/socket.io/socket.io.js"></script>
+    <h2 id="namePlayer"></h2>
+    <button id="set-name-button" class="options-button">Definir Nome</button>
     <canvas id="game-canvas" width="800" height="800"></canvas>
-    <button id="reset-button">Jogar Novamente</button>
+    <div id="game-container">
+        <button id="reset-button">Jogar Novamente</button>
+        <div id="options-play">
+            <button class="options-button" id="pedra-option">Pedra</button>
+            <button class="options-button" id="papel-option">Papel</button>
+            <button class="options-button" id="tesoura-option">Tesoura</button>
+        </div>
+    </div>
     <script src="script.js"></script>
 </body>
 

@@ -1,12 +1,33 @@
 const canvas = document.getElementById("game-canvas");
 const context = canvas.getContext("2d");
 
+const pedraButton = document.getElementById("pedra-option");
+const papelButton = document.getElementById("papel-option");
+const tesouraButton = document.getElementById("tesoura-option");
+
+document.getElementById("set-name-button").addEventListener("click", setPlayerName);
+const setNameButton = document.getElementById("set-name-button");
+setNameButton.style.display = "block";
+
+pedraButton.addEventListener("click", () => makePlay("Pedra"));
+papelButton.addEventListener("click", () => makePlay("Papel"));
+tesouraButton.addEventListener("click", () => makePlay("Tesoura"));
+
 let plays = [];
+
+let playerName = null;
 let playerPlay = null;
+
+let opponentName = null;
 let opponentPlay = null;
+
 let result = null;
 let gameState = "waiting";
 let waitingMessage = "";
+
+const optionsPlay = document.getElementById("options-play");
+optionsPlay.style.display = "flex";
+
 const resetButton = document.getElementById("reset-button");
 resetButton.addEventListener("click", resetGame);
 resetButton.style.display = "none"; // Esconder o botão inicialmente
@@ -18,12 +39,13 @@ socket.on("plays", (availablePlays) => {
 });
 
 
+
+
 socket.on("result", (data) => {
     playerPlay = data.player;
     opponentPlay = data.opponent;
     result = determineResult(playerPlay, opponentPlay);
     gameState = "result"; // atualiza o estado para "result"
-
     draw();
 });
 
@@ -48,26 +70,63 @@ function determineResult(player, opponent) {
     }
 }
 
+function setPlayerName() {
+    playerName = prompt("Digite seu nome:");
+    socket.emit("setPlayerName", playerName);
+    setNameButton.style.display = "none";
+    document.getElementById("namePlayer").innerHTML = playerName;
+  }
 
+
+
+
+function imagePlayerPlay(play) {
+    const image = new Image();
+    image.src = `images/${play}.png`;
+    image.onload = function () {
+        const x = (canvas.width - image.width / 2) / 4;
+        const y = (canvas.height - image.height / 8) / 2;
+        context.drawImage(image, x, y, image.width / 6, image.height / 6);
+    };
+}
+function imageOpponentPlay(play) {
+    const image = new Image();
+    image.src = `images/${play}.png`;
+    image.onload = function() {
+        const x = canvas.width  - (image.width / 4) ;
+        const y = (canvas.height - image.height / 8) / 2;
+        context.drawImage(image, x, y, image.width / 6, image.height / 6);
+    };
+}
 
 function draw() {
     const playSize = canvas.width / 3;
     context.clearRect(0, 0, canvas.width, canvas.height);
 
-    for (let i = 0; i < plays.length; i++) {
-        context.fillStyle = "#DDD";
-        context.fillRect(i * playSize, 0, playSize, playSize);
-        context.fillStyle = "black";
-        context.font = "48px Arial";
-        context.textAlign = "center";
-        context.textBaseline = "middle";
-        context.fillText(plays[i], i * playSize + playSize / 2, playSize / 2);
-    }
+    // Posicionar a imagem "versus.png" no centro da tela
+    const image = new Image();
+    image.src = "images/versus.png";
+    image.onload = function () {
+        const x = (canvas.width - image.width / 8) / 2;
+        const y = (canvas.height - image.height / 8) / 2;
+        context.drawImage(image, x, y, image.width / 8, image.height / 8);
+    };
+
+   
     if (waitingMessage !== "") {
         context.font = "24px Arial";
         context.textAlign = "right";
         context.textBaseline = "middle";
         context.fillText(waitingMessage, canvas.width - 10, canvas.height / 2);
+    }
+
+    
+    if (playerPlay !== null) {
+        imagePlayerPlay(playerPlay);
+        optionsPlay.style.display = "none";
+    }
+    if (opponentPlay !== null) {
+        imageOpponentPlay(opponentPlay);
     }
 
     if (gameState === "played") {
@@ -78,23 +137,26 @@ function draw() {
         context.fillText("Aguardando oponente...", canvas.width - 10, canvas.height / 2);
 
     } else if (playerPlay !== null && opponentPlay !== null && result !== null) {
-
         context.clearRect(0, 0, canvas.width, canvas.height);
-        context.font = "24px Arial";
+        context.font = "30px Arial";
         context.textAlign = "center";
         context.textBaseline = "middle";
-        context.fillText(`Você: ${playerPlay} | Oponente: ${opponentPlay}`, canvas.width / 2, canvas.height / 1.7);
-
-        context.fillText(result, canvas.width / 2, canvas.height / 2.5);
+        context.fillText(`${playerName} : ${playerPlay} | Oponente: ${opponentPlay}`, canvas.width / 2, canvas.height - 20);
+        
+        context.font = "45px Arial";
+        context.fillText(result, canvas.width / 2, canvas.height / 3);
         context.fillStyle = "#DDD";
         context.fillRect(canvas.width / 2 - 75, playSize * 3, 150, 50);
         context.fillStyle = "black";
+        optionsPlay.style.display = "none";
 
         resetButton.style.display = "block"; // Mostrar o botão "reset-button"
         waitingMessage = "";
 
     } else {
-        resetButton.style.display = "none"; // Esconder o botão "reset-button"
+        resetButton.style.display = "none";
+        optionsPlay.style.display = "flex";
+        // Esconder o botão "reset-button"
     }
 }
 
@@ -104,45 +166,15 @@ function drawWaitingMessage() {
     context.fillText(waitingMessage, canvas.width / 2, playSize * 2);
 }
 
-canvas.addEventListener("click", (event) => {
+function makePlay(play) {
     if (playerPlay !== null) {
         return;
     }
 
-    const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-
-    const playSize = canvas.width / 3;
-
-    if (y > playSize) {
-        return;
-    }
-
-    const playIndex = Math.floor(x / playSize);
-    playerPlay = plays[playIndex];
+    playerPlay = play;
     gameState = "played"; // atualiza o estado para "played"
     draw();
     socket.emit("play", playerPlay);
-});
-
-canvas.addEventListener("click", handleResetClick);
-
-function handleResetClick(event) {
-    const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-
-    const playSize = canvas.width / 3;
-
-    if (
-        y > playSize * 3 &&
-        y < playSize * 3 + 50 &&
-        x > canvas.width / 2 - 75 &&
-        x < canvas.width / 2 + 75
-    ) {
-        resetGame();
-    }
 }
 
 function resetGame() {

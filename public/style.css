@@ -11,4 +11,14 @@ canvas {
 #reset-button{
     margin: 20px;
     padding: 10px 50px;
+    font-size: 2rem;
+}
+#options-play{
+  display: flex;
+}
+
+.options-button{
+    font-size: 2rem;
+    margin: 20px;
+    padding: 10px 50px;
 }
