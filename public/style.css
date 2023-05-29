@@ -1,11 +1,25 @@
 
+@import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
+
 body{
     display: flex;
     flex-direction: column;
     align-items: center;
+    flex-wrap: wrap;
+    background-color: #303030;
+    font-family: 'Anton', sans-serif;
+    color: white;
 }
 canvas {
     border: 1px solid black;
+}
+
+#title{
+    background-color: #ff3131;
+    margin: 2%;
+    padding: 1% 2%;
+    border-radius: 40%;
+    font-weight: normal;
 }
 
 #reset-button{
@@ -35,4 +49,20 @@ canvas {
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
+}
+#name-input{
+    background-color: #303030;
+    border-color: #ff3131;
+    color: white;
+    
+}
+#player-input-img{
+    opacity: 0.2;
+   
+}
+#waiting-message{
+    font-weight: normal;
+}
+#status-name{
+    font-weight: normal;
 }

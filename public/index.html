@@ -12,14 +12,22 @@
 
 <body>
     <script src="/socket.io/socket.io.js"></script>
+    <div id="title">
+        <h1>Pedra, Papel e Tesoura</h1>
+    </div>
     <div id="player-input" class="options-button">
-        <label for="player-name" >Nome do jogador:</label>
-        <input id="name-input" type="text" placeholder="Digite seu nome"><p id="status-name"></p></input>
-        <p id="waiting-message"></p>
+        <label for="player-name" >Digite seu nome para jogar:</label>
+        <input id="name-input" type="text" placeholder="Digite seu nome"><h6 id="status-name"></h6></input>
+        <h6 id="waiting-message"></h6>
+    </div>
+    <div id="player-input-img">
+        <img src="images/pedra.png">
+        <img src="images/tesoura.png">
+        <img src="images/papel.png">
     </div>
     <div id="game-container" style="display: none">
         <h2 id="namePlayer"></h2>
-        <canvas id="game-canvas" width="800" height="700"></canvas>
+        <canvas id="game-canvas" width="700" height="600"></canvas>
 
         <button id="reset-button">Jogar Novamente</button>
         <div id="options-play">
