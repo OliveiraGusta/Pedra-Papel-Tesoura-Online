@@ -31,11 +31,16 @@ canvas {
 }
 
 #subtitle a{
-    padding: 5%;
+    padding: 2%;
     text-decoration: none;
     color: #ff3131;
     font-size:x-large;
 }
+
+#subtitle a:hover{
+    color: #303030;
+}
+
 
 #reset-button{
     margin: 20px;
@@ -84,3 +89,74 @@ canvas {
 #status-name{
     font-weight: normal;
 }
+
+#tudom{
+display: flex;
+justify-content: center;
+flex-direction: row-reverse;
+
+}
+
+#mateus p{
+    font-size: large;
+}
+
+#mateus a{
+    color: #ff3131;
+    padding: 3%;
+    margin: 1%;
+    text-decoration: none;
+    font-size: large;
+}
+#mateus-img{
+    display: flex;
+    justify-content: start;
+    padding: 2%;
+}
+
+#mateus a:hover{
+    color: #303030;
+}
+
+
+#tudog{
+    display: flex;
+    justify-content: center;
+}
+
+#gustavo p{
+    font-size: large;
+}
+
+#gustavo a{
+    color: #ff3131;
+    padding: 3%;
+    margin: 1%;
+    text-decoration: none;
+    font-size: large
+}
+
+#gustavo a:hover{
+    color: #303030;
+}
+
+#gustavo-img{
+    display: flex;
+    justify-content: start;
+    padding: 2%;
+}
+
+a{
+    color: #ff3131;
+    text-decoration: none;
+}
+
+a:hover{
+    color: #303030;
+}
+
+#img-homepage{
+    display: flex;
+    justify-content: center;
+}
+
