@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedra, Papel e Tesoura</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+</head>
+
+<body>
+    <script src="/socket.io/socket.io.js"></script>
+    <div id="player-input" class="options-button">
+        <label for="player-name" >Digite seu nome para jogar:</label>
+        <input id="name-input" type="text" placeholder="Digite seu nome"><h6 id="status-name"></h6></input>
+        <h6 id="waiting-message"></h6>
+        <div id="player-input-img">
+            <img src="images/pedra.png">
+            <img src="images/tesoura.png">
+            <img src="images/papel.png">
+        </div>
+    </div>
+  
+    <div id="game-container" style="display: none">
+        <h2 id="namePlayer"></h2>
+        <canvas id="game-canvas" width="700" height="600"></canvas>
+
+        <button id="reset-button">Jogar Novamente</button>
+        <div id="options-play">
+            <button class="options-button" id="pedra-option">Pedra</button>
+            <button class="options-button" id="papel-option">Papel</button>
+            <button class="options-button" id="tesoura-option">Tesoura</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
