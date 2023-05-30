@@ -27,16 +27,13 @@ let waitingMessage = "";
 let playerScore = 0;
 let opponentScore = 0;
 
-let showOpponentPlayAgain = false;
-
-
 
 const optionsPlay = document.getElementById("options-play");
 optionsPlay.style.display = "none";
 
 const resetButton = document.getElementById("reset-button");
 
-resetButton.addEventListener("click", playAgain);
+resetButton.addEventListener("click", resetGame);
 resetButton.style.display = "none"; // Esconder o botão inicialmente
 
 const waitingMessageElement = document.getElementById("waiting-message");
@@ -82,16 +79,6 @@ socket.on("opponentName", (name) => {
     checkNames(); // Verificar se ambos os nomes estão definidos
 });
 
-
-function drawOpponentPlayAgainMessage() {
-    if (showOpponentPlayAgain) {
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        context.font = "20px Arial";
-        context.fillStyle = "#000";
-        context.textAlign = "center";
-        context.fillText("O oponente clicou em jogar novamente!", canvas.width / 2, canvas.height / 2);
-    }
-}
 
 
 function determineResult(player, opponent) {
@@ -163,16 +150,7 @@ function imageOpponentPlay(play) {
         context.restore();
     };
 }
-function playAgain() {
-    // Emitir o evento para o servidor informando que o jogador clicou em jogar novamente
-    socket.emit("playAgain");
-}
 
-socket.on("opponentPlayAgain", () => {
-    // Define a variável como true para mostrar a mensagem
-    showOpponentPlayAgain = true;
-
-});
 
 function draw() {
     const playSize = canvas.width / 3;
@@ -238,10 +216,8 @@ function draw() {
         optionsPlay.style.display = "flex";
         // Esconder o botão "reset-button"
     }
-    drawOpponentPlayAgainMessage();
     updateScore();
    
-    // Chame a função para atualizar o canvas
 
 }
 
@@ -263,7 +239,7 @@ function resetGame() {
     gameState = "waiting";
 
     draw();
-    socket.emit("reset"); // Envie um sinal para redefinir o estado no servidor, se necessário
+    socket.emit("reset"); // Envie um sinal para redefinir o estado no servidor
 }
 
 draw();

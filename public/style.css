@@ -133,7 +133,10 @@ flex-direction: row-reverse;
 #gustavo p{
     font-size: large;
 }
-
+#game-rules-description p{
+    font-size: large;
+    color: black;
+}
 #gustavo a{
     color: #ff3131;
     padding: 3%;
