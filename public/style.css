@@ -3,10 +3,6 @@
 
 
 body{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex-wrap: wrap;
     background-color: #fff;
     font-family: 'Montserrat', sans-serif;
     color:  #303030;
@@ -16,12 +12,29 @@ canvas {
 }
 
 #title{
-    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-wrap: wrap;
     margin: 2%;
     padding: 1% 2%;
     border-radius: 50%;
     font-weight: normal;
-    
+}
+
+#subtitle{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 10%;
+}
+
+#subtitle a{
+    padding: 5%;
+    text-decoration: none;
+    color: #ff3131;
+    font-size:x-large;
 }
 
 #reset-button{
@@ -59,9 +72,10 @@ canvas {
     color:  #303030;
 }
 #player-input-img{
-    opacity: 0.2;
     z-index: -1000;
     user-select: none;
+    display: flex;
+    justify-content: center;
    
 }
 #waiting-message{
