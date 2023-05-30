@@ -3,9 +3,10 @@
 
 
 body{
-    background-color: #fff;
+    background: url(images/Play.jpeg);
     font-family: 'Montserrat', sans-serif;
     color:  #303030;
+
 }
 canvas {
     border: 1px solid black;
