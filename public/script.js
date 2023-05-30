@@ -24,6 +24,10 @@ let result = null;
 let gameState = "waiting";
 let waitingMessage = "";
 
+let playerScore = 0;
+let opponentScore = 0;
+
+
 const optionsPlay = document.getElementById("options-play");
 optionsPlay.style.display = "none";
 
@@ -74,31 +78,46 @@ socket.on("opponentName", (name) => {
     checkNames(); // Verificar se ambos os nomes estão definidos
   });
 
-function determineResult(player, opponent) {
+  function determineResult(player, opponent) {
     if (player === opponent) {
-        return "Empate!";
+      return "Empate!";
     } else if (
-        (player === "Pedra" && opponent === "Tesoura") ||
-        (player === "Papel" && opponent === "Pedra") ||
-        (player === "Tesoura" && opponent === "Papel")
+      (player === "Pedra" && opponent === "Tesoura") ||
+      (player === "Papel" && opponent === "Pedra") ||
+      (player === "Tesoura" && opponent === "Papel")
     ) {
-        return "Você ganhou!";
+      playerScore++; // Incrementa o ponto do jogador
+      return "Você ganhou!";
     } else {
-        return "Você perdeu!";
+      opponentScore++; // Incrementa o ponto do oponente
+      return "Você perdeu!";
     }
-}
-
+  }
 function setPlayerName() {
     playerName = nameInput.value;
     statusName.innerHTML = "Nome escolhido: " + playerName;
     socket.emit("setPlayerName", playerName);
 }
 
+function updateScore() {
+    const centerX = canvas.width / 2;
+    const topY = 50;
+  
+    context.font = "bold 30px Arial";
+    context.fillStyle = "#000";
+    context.textAlign = "center";
+    context.fillText(`Placar`, centerX, topY);
+  
+    context.font = "24px Arial";
+    context.fillText(`${playerName} ${playerScore} - ${opponentName} ${opponentScore}`, centerX, topY + 30);
+  }
+  
+
 function checkNames() {
     if (opponentName !== null && opponentName !== "" && playerName !== null && playerName !== "") {
       console.log(opponentName + " vs " + playerName);
       playerInput.style.display = "none";
-      gameContainer.style.display = "block";
+      gameContainer.style.display = "flex";
       document.getElementById("namePlayer").innerHTML = `${playerName} vs ${opponentName}`;
       draw(); // Atualizar a tela quando ambos os nomes estiverem definidos
     }
@@ -108,20 +127,25 @@ function imagePlayerPlay(play) {
     const image = new Image();
     image.src = `images/${play}.png`;
     image.onload = function () {
-        const x = (canvas.width - image.width / 2) / 4;
-        const y = (canvas.height - image.height / 8) / 2;
-        context.drawImage(image, x, y, image.width / 6, image.height / 6);
+        const x = (canvas.width - image.width / 2) / 10;
+        const y = (canvas.height - image.height / 8) / 2.5;
+        context.drawImage(image, x, y, image.width / 1.5, image.height / 1.5);
     };
 }
 
 function imageOpponentPlay(play) {
     const image = new Image();
-    image.src = `images/${play}.png`;
-    image.onload = function () {
-        const x = canvas.width - image.width / 4;
-        const y = (canvas.height - image.height / 8) / 2;
-        context.drawImage(image, x, y, image.width / 6, image.height / 6);
-    };
+image.src = `images/${play}.png`;
+image.onload = function () {
+    const x = canvas.width - image.width / 1.2;
+    const y = (canvas.height - image.height / 8) / 2.5;
+    
+    // Espelha a imagem horizontalmente
+    context.save();
+    context.scale(-1, 1);
+    context.drawImage(image, -x - image.width / 1.5, y, image.width / 1.5, image.height / 1.5);
+    context.restore();
+};
 }
 
 function draw() {
@@ -136,11 +160,12 @@ function draw() {
         context.drawImage(image, x, y, image.width / 8, image.height / 8);
     };
 
+    updateScore();
     if (opponentName !== null && opponentName !== "" && playerName !== null && playerName !== "")
     {
         console.log(opponentName + " vs " + playerName);
         playerInput.style.display = "none";
-        gameContainer.style.display = "block";
+        gameContainer.style.display = "flex";
         
     }
 
@@ -167,6 +192,7 @@ function draw() {
         context.fillText("Aguardando oponente...", canvas.width - 10, canvas.height / 2);
     } else if (playerPlay !== null && opponentPlay !== null && result !== null) {
         context.clearRect(0, 0, canvas.width, canvas.height);
+        updateScore()
         context.font = "30px Arial";
         context.textAlign = "center";
         context.textBaseline = "middle";
