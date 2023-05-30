@@ -16,11 +16,12 @@ canvas {
 }
 
 #title{
-    background-color: #ff3131;
+    
     margin: 2%;
     padding: 1% 2%;
     border-radius: 50%;
     font-weight: normal;
+    
 }
 
 #reset-button{
