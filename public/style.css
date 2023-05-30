@@ -49,15 +49,16 @@ canvas {
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
+    z-index: 2;
 }
 #name-input{
     background-color: #303030;
     border-color: #ff3131;
     color: white;
-    
 }
 #player-input-img{
     opacity: 0.2;
+    z-index: 1;
    
 }
 #waiting-message{
