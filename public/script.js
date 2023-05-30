@@ -27,12 +27,16 @@ let waitingMessage = "";
 let playerScore = 0;
 let opponentScore = 0;
 
+let showOpponentPlayAgain = false;
+
+
 
 const optionsPlay = document.getElementById("options-play");
 optionsPlay.style.display = "none";
 
 const resetButton = document.getElementById("reset-button");
-resetButton.addEventListener("click", resetGame);
+
+resetButton.addEventListener("click", playAgain);
 resetButton.style.display = "none"; // Esconder o botão inicialmente
 
 const waitingMessageElement = document.getElementById("waiting-message");
@@ -47,10 +51,10 @@ const nameInput = document.getElementById("name-input");
 
 nameInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
-      setPlayerName();
-      checkNames(); // Verificar se ambos os nomes estão definidos
+        setPlayerName();
+        checkNames(); // Verificar se ambos os nomes estão definidos
     }
-  });
+});
 
 const socket = io();
 
@@ -76,23 +80,35 @@ socket.on("opponentName", (name) => {
     opponentName = name;
     waitingMessageElement.innerHTML = "Oponente aguardando você escolher seu nome...";
     checkNames(); // Verificar se ambos os nomes estão definidos
-  });
+});
 
-  function determineResult(player, opponent) {
-    if (player === opponent) {
-      return "Empate!";
-    } else if (
-      (player === "Pedra" && opponent === "Tesoura") ||
-      (player === "Papel" && opponent === "Pedra") ||
-      (player === "Tesoura" && opponent === "Papel")
-    ) {
-      playerScore++; // Incrementa o ponto do jogador
-      return "Você ganhou!";
-    } else {
-      opponentScore++; // Incrementa o ponto do oponente
-      return "Você perdeu!";
+
+function drawOpponentPlayAgainMessage() {
+    if (showOpponentPlayAgain) {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.font = "20px Arial";
+        context.fillStyle = "#000";
+        context.textAlign = "center";
+        context.fillText("O oponente clicou em jogar novamente!", canvas.width / 2, canvas.height / 2);
     }
-  }
+}
+
+
+function determineResult(player, opponent) {
+    if (player === opponent) {
+        return "Empate!";
+    } else if (
+        (player === "Pedra" && opponent === "Tesoura") ||
+        (player === "Papel" && opponent === "Pedra") ||
+        (player === "Tesoura" && opponent === "Papel")
+    ) {
+        playerScore++; // Incrementa o ponto do jogador
+        return "Você ganhou!";
+    } else {
+        opponentScore++; // Incrementa o ponto do oponente
+        return "Você perdeu!";
+    }
+}
 function setPlayerName() {
     playerName = nameInput.value;
     statusName.innerHTML = "Nome escolhido: " + playerName;
@@ -102,27 +118,27 @@ function setPlayerName() {
 function updateScore() {
     const centerX = canvas.width / 2;
     const topY = 50;
-  
+
     context.font = "bold 30px Arial";
     context.fillStyle = "#000";
     context.textAlign = "center";
     context.fillText(`Placar`, centerX, topY);
-  
+
     context.font = "24px Arial";
     context.fillText(`${playerName} ${playerScore} - ${opponentName} ${opponentScore}`, centerX, topY + 30);
-  }
-  
+}
+
 
 function checkNames() {
     if (opponentName !== null && opponentName !== "" && playerName !== null && playerName !== "") {
-      console.log(opponentName + " vs " + playerName);
-      playerInput.style.display = "none";
-      gameContainer.style.display = "flex";
-      document.getElementById("namePlayer").innerHTML = `${playerName} vs ${opponentName}`;
-      draw(); // Atualizar a tela quando ambos os nomes estiverem definidos
+        console.log(opponentName + " vs " + playerName);
+        playerInput.style.display = "none";
+        gameContainer.style.display = "flex";
+        document.getElementById("namePlayer").innerHTML = `${playerName} vs ${opponentName}`;
+        draw(); // Atualizar a tela quando ambos os nomes estiverem definidos
     }
-  }
-  
+}
+
 function imagePlayerPlay(play) {
     const image = new Image();
     image.src = `images/${play}.png`;
@@ -135,18 +151,28 @@ function imagePlayerPlay(play) {
 
 function imageOpponentPlay(play) {
     const image = new Image();
-image.src = `images/${play}.png`;
-image.onload = function () {
-    const x = canvas.width - image.width / 1.2;
-    const y = (canvas.height - image.height / 8) / 2.5;
-    
-    // Espelha a imagem horizontalmente
-    context.save();
-    context.scale(-1, 1);
-    context.drawImage(image, -x - image.width / 1.5, y, image.width / 1.5, image.height / 1.5);
-    context.restore();
-};
+    image.src = `images/${play}.png`;
+    image.onload = function () {
+        const x = canvas.width - image.width / 1.2;
+        const y = (canvas.height - image.height / 8) / 2.5;
+
+        // Espelha a imagem horizontalmente
+        context.save();
+        context.scale(-1, 1);
+        context.drawImage(image, -x - image.width / 1.5, y, image.width / 1.5, image.height / 1.5);
+        context.restore();
+    };
 }
+function playAgain() {
+    // Emitir o evento para o servidor informando que o jogador clicou em jogar novamente
+    socket.emit("playAgain");
+}
+
+socket.on("opponentPlayAgain", () => {
+    // Define a variável como true para mostrar a mensagem
+    showOpponentPlayAgain = true;
+
+});
 
 function draw() {
     const playSize = canvas.width / 3;
@@ -160,13 +186,13 @@ function draw() {
         context.drawImage(image, x, y, image.width / 8, image.height / 8);
     };
 
-    updateScore();
-    if (opponentName !== null && opponentName !== "" && playerName !== null && playerName !== "")
-    {
+
+
+    if (opponentName !== null && opponentName !== "" && playerName !== null && playerName !== "") {
         console.log(opponentName + " vs " + playerName);
         playerInput.style.display = "none";
         gameContainer.style.display = "flex";
-        
+
     }
 
     if (waitingMessage !== "") {
@@ -212,6 +238,11 @@ function draw() {
         optionsPlay.style.display = "flex";
         // Esconder o botão "reset-button"
     }
+    drawOpponentPlayAgainMessage();
+    updateScore();
+   
+    // Chame a função para atualizar o canvas
+
 }
 
 function makePlay(play) {

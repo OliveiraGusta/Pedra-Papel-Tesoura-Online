@@ -40,6 +40,11 @@ io.on("connection", (socket) => {
   // Envia as jogadas disponíveis para o novo jogador
   socket.emit("plays", plays);
 
+  socket.on("playAgain", () => {
+    // Emitir o evento para o cliente informando que o oponente clicou em jogar novamente
+    io.to(room).emit("opponentPlayAgain");
+  });
+  
   // Quando um jogador envia o nome
   socket.on("setPlayerName", (name) => {
     console.log(`Nome do jogador ${socket.id}: ${name}`);
